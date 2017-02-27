@@ -6,7 +6,6 @@ import processing.net.Server;
  * Created by roscale on 2/27/17.
  */
 public class Network {
-    PApplet p;
 
     Server s;
     Client c;

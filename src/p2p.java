@@ -1,11 +1,10 @@
 import processing.core.PApplet;
-import processing.core.PVector;
-import processing.net.*;
 
 /**
  * Created by roscale on 2/26/17.
  */
 public class p2p extends PApplet {
+
     Network nw;
 
     boolean guessing;
@@ -19,7 +18,6 @@ public class p2p extends PApplet {
 
     public void setup()
     {
-
     }
 
     public void draw()
@@ -81,10 +79,9 @@ public class p2p extends PApplet {
                 println("It's not " + number.value + ".");
                 nw.send(new Bool(false));
             }
-            return;
         }
 
-        if (guessing)
+        else if (guessing)
         {
             Bool response = Bool.decode(rawPacket);
 
@@ -104,7 +101,6 @@ public class p2p extends PApplet {
                 println("Guess this number... " + drawnNumber);
                 guessing = false;
             }
-            return;
         }
     }
 }

@@ -1,3 +1,4 @@
+import P2P.Connection;
 import processing.core.PApplet;
 
 /**
@@ -5,7 +6,7 @@ import processing.core.PApplet;
  */
 public class p2p extends PApplet {
 
-    Network nw;
+    Connection network;
 
     boolean guessing;
     int drawnNumber;
@@ -24,46 +25,46 @@ public class p2p extends PApplet {
     {
         background(0);
 
-        if (nw == null)
+        if (network == null)
             return;
 
-        String receivedData = nw.receive();
-        if (receivedData != null)
-            for (String rawPacket : NetworkPacket.separate(receivedData))
-                parse(rawPacket);
+        for (Object obj : network.receiveObjects())
+            parse(obj);
     }
 
     public void keyPressed()
     {
         if (key == 's')
         {
-            nw = new Network(this, 12345);
+            network = new Connection(this, 12345);
             guessing = false;
             drawnNumber = floor(random(20));
             println("Try to guess this number... " + drawnNumber);
         }
         else if (key == 'c')
         {
-            nw = new Network(this, "192.168.1.4", 12345);
+            network = new Connection(this, "192.168.1.2", 12345);
             guessing = true;
 
             // Begin the loop
             Number toSend = new Number(floor(random(20)));
             println("Is it " + toSend.value + " ?");
-            nw.send(toSend);
+
+            network.sendObject(toSend);
         }
     }
 
-    void parse(String rawPacket)
+    void parse(Object obj)
     {
         if (!guessing)
         {
-            Number number = Number.decode(rawPacket);
+            Number number = (Number) obj;
 
             if (number.value == drawnNumber)
             {
                 guessing = true;
-                nw.send(new Bool(true));
+
+                network.sendObject(new Bool(true));
                 println("You guessed the number " + number.value + " !!");
 
                 delay(1000);
@@ -71,19 +72,21 @@ public class p2p extends PApplet {
                 // Begin the loop
                 Number toSend = new Number(floor(random(20)));
                 println("Is it " + toSend.value + " ?");
-                nw.send(toSend);
+
+                network.sendObject(toSend);
 
             }
             else
             {
                 println("It's not " + number.value + ".");
-                nw.send(new Bool(false));
+
+                network.sendObject(new Bool(false));
             }
         }
 
         else if (guessing)
         {
-            Bool response = Bool.decode(rawPacket);
+            Bool response = (Bool) obj;
 
             if (response.value == false)
             {
@@ -91,7 +94,8 @@ public class p2p extends PApplet {
 
                 Number toSend = new Number(floor(random(20)));
                 println("Is it " + toSend.value + " ?");
-                nw.send(toSend);
+
+                network.sendObject(toSend);
             }
             else
             {
